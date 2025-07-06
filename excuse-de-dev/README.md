@@ -3,6 +3,7 @@
 ### Prérequis
 - Node.js (version 16+)
 - npm ou yarn
+- PostgreSQL (version 13+)
 
 ### Installation
 ```bash
@@ -33,11 +34,6 @@ npm run server
 # Terminal 2 - Frontend (port 3000)
 npm run client
 ```
-
-### Accès à l'application
-- **Frontend** : http://localhost:3000
-- **API Backend** : http://localhost:3001
-- **Test API** : http://localhost:3001/api/health
 
 ## Build et déploiement
 

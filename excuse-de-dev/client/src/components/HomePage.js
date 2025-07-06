@@ -3,9 +3,6 @@ import axios from 'axios';
 import GenerateButton from './GenerateButton';
 import AddExcuseModal from './AddExcuseModal';
 
- // Composant HomePage - Page principale de l'application des excuses de dev
- // return la page d'accueil avec le générateur d'excuses
-
 const HomePage = () => {
   const [currentExcuse, setCurrentExcuse] = useState(null);
   const [excuses, setExcuses] = useState([]);
@@ -13,16 +10,12 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [titleAnimated, setTitleAnimated] = useState(false);
-  const [showButtons, setShowButtons] = useState(false);
 
   useEffect(() => {
     fetchExcuses();
     
     const titleTimer = setTimeout(() => {
       setTitleAnimated(true);
-      setTimeout(() => {
-        setShowButtons(true);
-      }, 500);
     }, 2000);
 
     return () => clearTimeout(titleTimer);
@@ -31,7 +24,7 @@ const HomePage = () => {
   const fetchExcuses = async () => {
     try {
       const response = await axios.get('/api/excuses');
-      setExcuses(response.data);
+      setExcuses(response.data.data || response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des excuses:', error);
     }
@@ -63,6 +56,7 @@ const HomePage = () => {
 
   const handleGenerateExcuse = () => {
     setIsLoading(true);
+    
     const loadingTime = Math.random() * 4000 + 1000;
     
     setTimeout(() => {
@@ -74,12 +68,14 @@ const HomePage = () => {
   const handleAddExcuse = async (newExcuse) => {
     try {
       const response = await axios.post('/api/excuses', newExcuse);
-      setExcuses([...excuses, response.data]);
+      const createdExcuse = response.data.data || response.data;
+      setExcuses([...excuses, createdExcuse]);
       setShowModal(false);
       alert('Excuse ajoutée avec succès !');
     } catch (error) {
       console.error('Erreur lors de l\'ajout de l\'excuse:', error);
-      alert('Erreur lors de l\'ajout de l\'excuse');
+      const errorMessage = error.response?.data?.error || 'Erreur lors de l\'ajout de l\'excuse';
+      alert(errorMessage);
     }
   };
 
@@ -89,38 +85,34 @@ const HomePage = () => {
         Les Excuses de Dev
       </h1>
       
-      {titleAnimated && (
-        <div className="excuse-display">
-          {isLoading ? (
-            <div className="loader"></div>
-          ) : currentExcuse ? (
-            <div>
-              <div className="excuse-text">{currentExcuse.message}</div>
-              <div className="excuse-code">Code HTTP: {currentExcuse.http_code} | {currentExcuse.tag}</div>
-            </div>
-          ) : (
-            <div className="excuse-text">Cliquez sur le bouton pour générer une excuse !</div>
-          )}
-        </div>
-      )}
-
-      {showButtons && (
-        <div className="button-container">
-          <GenerateButton
-            onGenerate={handleGenerateExcuse}
-            isLoading={isLoading}
-          />
-          <button
-            className="add-button"
-            onClick={() => setShowModal(true)}
-          >
-            Ajouter une excuse
-          </button>
-        </div>
-      )}
+      <div className="excuse-display">
+        {isLoading ? (
+          <div className="loader"></div>
+        ) : currentExcuse ? (
+          <div>
+            <div className="excuse-text">{currentExcuse.message}</div>
+            <div className="excuse-code">Code HTTP: {currentExcuse.http_code} | {currentExcuse.tag}</div>
+          </div>
+        ) : (
+          <div className="excuse-text">Cliquez sur le bouton pour générer une excuse !</div>
+        )}
+      </div>
+      
+      <div className="button-container">
+        <GenerateButton 
+          onGenerate={handleGenerateExcuse} 
+          isLoading={isLoading}
+        />
+        <button 
+          className="add-button"
+          onClick={() => setShowModal(true)}
+        >
+          Ajouter une excuse
+        </button>
+      </div>
 
       {showModal && (
-        <AddExcuseModal
+        <AddExcuseModal 
           onAdd={handleAddExcuse}
           onClose={() => setShowModal(false)}
         />

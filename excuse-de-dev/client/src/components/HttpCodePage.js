@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
- // Composant HttpCodePage - Affiche une excuse selon un code HTTP
- // return le rendu de la page d'excuse HTTP
-
 const HttpCodePage = () => {
   const { httpCode } = useParams();
   const [excuse, setExcuse] = useState(null);
@@ -19,7 +16,7 @@ const HttpCodePage = () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/excuses/${httpCode}`);
-      setExcuse(response.data);
+      setExcuse(response.data.data || response.data);
       setError(false);
     } catch (err) {
       setError(true);
